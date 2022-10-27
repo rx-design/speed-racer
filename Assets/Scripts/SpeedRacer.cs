@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class SpeedRacer : MonoBehaviour
@@ -29,40 +30,47 @@ public class SpeedRacer : MonoBehaviour
     int weightThreshold = 1500;
     int yearThreshold = 2009;
 
+    private TextMeshProUGUI carInfo;
+    private TextMeshProUGUI fuelInfo;
+
+    private void Awake()
+    {
+        carInfo = GameObject
+            .Find("CarInfo")
+            .GetComponent<TextMeshProUGUI>();
+
+        fuelInfo = GameObject
+            .Find("FuelInfo")
+            .GetComponent<TextMeshProUGUI>();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        print($"The car model is {carModel} ({carMaker}) and the engine type is {engineType}.");
+        UpdateCarInfo($"The car model is {carModel} ({carMaker}) and the engine type is {engineType}.");
 
         CheckWeight();
 
         if (yearMade <= yearThreshold)
         {
-            print($"The car is made in {yearMade}.");
+            UpdateCarInfo($"The car is made in {yearMade}.");
 
             var carAge = CalculateAge(yearMade);
 
-            print($"The car is {carAge} years old.");
+            UpdateCarInfo($"The car is {carAge} years old.");
         }
         else
         {
-            print($"The car is made in 2010's");
-            print($"The car max acceleration is {maxAcceleration}");
+            UpdateCarInfo($"The car is made in 2010's");
+            UpdateCarInfo($"The car max acceleration is {maxAcceleration}");
         }
 
-        print(CheckCharacteristics());
+        UpdateCarInfo(CheckCharacteristics());
     }
 
     // Update is called once per frame
     void Update()
     {
-        var keyIsDown = Input.GetKeyDown(KeyCode.Space);
-
-        if (keyIsDown)
-        {
-            ConsumeFuel();
-        }
-
         CheckFuelLevel();
     }
 
@@ -70,11 +78,11 @@ public class SpeedRacer : MonoBehaviour
     {
         if (carWeight < weightThreshold)
         {
-            print($"{carModel} weight is less than {weightThreshold} kg.");
+            UpdateCarInfo($"{carModel} weight is less than {weightThreshold} kg.");
         }
         else
         {
-            print($"{carModel} weight is more than or equal to {weightThreshold} kg.");
+            UpdateCarInfo($"{carModel} weight is more than or equal to {weightThreshold} kg.");
         }
     }
 
@@ -101,7 +109,7 @@ public class SpeedRacer : MonoBehaviour
         }
     }
 
-    void ConsumeFuel()
+    public void ConsumeFuel()
     {
         carFuel.fuelLevel = Math.Max(0, carFuel.fuelLevel - 10);
     }
@@ -111,17 +119,32 @@ public class SpeedRacer : MonoBehaviour
         switch (carFuel.fuelLevel)
         {
             case 70:
-                print("The fuel level is nearing two-thirds.");
+                UpdateFuelInfo("The fuel level is nearing two-thirds.");
                 break;
             case 50:
-                print("The fuel level is at half amount.");
+                UpdateFuelInfo("The fuel level is at half amount.");
                 break;
             case 10:
-                print("Warning! Fuel level is critically low.");
+                UpdateFuelInfo("Warning! Fuel level is critically low.");
                 break;
             default:
-                print($"The fuel level is {carFuel.fuelLevel}.");
+                UpdateFuelInfo($"The fuel level is {carFuel.fuelLevel}.");
                 break;
         }
+    }
+
+    void UpdateCarInfo(string text)
+    {
+        if (carInfo.text != "")
+        {
+            carInfo.text += "\n";
+        }
+
+        carInfo.text += text;
+    }
+
+    void UpdateFuelInfo(string text)
+    {
+        fuelInfo.text = text;
     }
 }
